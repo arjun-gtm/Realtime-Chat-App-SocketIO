@@ -12,7 +12,7 @@ export const registerUser = expressAsyncHandler(async (req, res) => {
         throw new Error("All fields are required.")
     }
 
-    if (password.lenth() < 8) {
+    if (password.length < 8) {
         res.status(400)
         throw new Error("Password length must be 8 characters.")
     }
