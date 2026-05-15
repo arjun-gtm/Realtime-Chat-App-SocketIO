@@ -23,6 +23,7 @@ app.use(errorHandler)
 app.get('/',(req,res) => {
     res.send("API is working.")
 })
+app.use(errorHandler)
 
 app.listen(PORT, () =>{
     console.log(`The backend is running on http://localhost:${PORT}`);
