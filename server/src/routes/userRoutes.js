@@ -4,7 +4,7 @@ import { errorHandler } from '../middlewares/errorHandler.js'
 
 const router = express.Router()
 
-router.post('/register',errorHandler,registerUser)
-router.post('/login',errorHandler,loginUser)
+router.post('/register',registerUser)
+router.post('/login',loginUser)
 
 export default router
