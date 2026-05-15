@@ -13,7 +13,7 @@ export const registerUser = expressAsyncHandler(async (req, res) => {
         throw new Error("All fields are required.")
     }
 
-    const alreadyRegistered = await user.findOne({ email })
+    const alreadyRegistered = await User.findOne({ email })
     if (alreadyRegistered) {
         res.status(400)
         throw new Error("Email is already registered.")
@@ -29,13 +29,21 @@ export const registerUser = expressAsyncHandler(async (req, res) => {
 
     await newUser.save()
 
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-        expiresIn: "7d",
+    const token = jwt.sign({
+        id: newUser._id
+    }, process.env.JWT_SECRET, {
+        expiresIn: '7d'
     })
 
     res.status(201).json({
         message: "User registered successfully.",
-        token: token
+        token,
+        user: {
+            id: newUser._id,
+            name: newUser.name,
+            email: newUser.email,
+            role: newUser.role,
+        },
     })
 })
 
