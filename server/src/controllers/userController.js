@@ -81,7 +81,7 @@ export const loginUser = expressAsyncHandler(async (req, res) => {
 
     res.status(200).json({
         message: "Login Successful.",
-        token: token,
+        token,
         user: {
             id: user._id,
             name: user.name,
@@ -90,3 +90,7 @@ export const loginUser = expressAsyncHandler(async (req, res) => {
         }
     })
 })
+
+export const profile = async (req, res) => {
+  res.json(req.user)
+}

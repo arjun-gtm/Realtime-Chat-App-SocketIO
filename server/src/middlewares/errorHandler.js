@@ -1,4 +1,3 @@
-import expressAsyncHandler from "express-async-handler"
 import { constants } from "../../constants.js"
 
 export const errorHandler = (err, req, res, next) => {
@@ -44,4 +43,6 @@ export const errorHandler = (err, req, res, next) => {
         default:
             break;
     }
+
+    next()
 } 
