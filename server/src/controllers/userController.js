@@ -1,96 +1,83 @@
-import expressAsyncHandler from "express-async-handler";
-import bcrypt from "bcryptjs";
-import jwt from 'jsonwebtoken'
-import User from "../models/userModel.js";
+import expressAsyncHandler from "express-async-handler"
+import User from "../models/userModel.js"
+import bcrypt from "bcryptjs"
 
-export const registerUser = expressAsyncHandler(async (req, res) => {
+export const getUsers = expressAsyncHandler(async (req, res) => {
+    const users = await User.find().select("-password")
+
+    res.status(200).json({
+        totalUsers: users.length,
+        users
+    })
+})
+
+export const getUser = expressAsyncHandler(async (req, res) => {
+    const userId = req.params.id
+    const user = await User.findById(userId).select("-password")
+
+    if (!user) {
+        res.status(404)
+        throw new Error("No user found.")
+    }
+
+    res.status(200).json(user)
+})
+
+export const updateUser = expressAsyncHandler(async (req, res) => {
+
+    const userId = req.params.id
+
+    const user = await User.findById(userId)
+
+    if (!user) {
+        res.status(404)
+        throw new Error("No user found.")
+    }
 
     const { name, email, password } = req.body
 
-    if (!name || !email || !password) {
-        res.status(400)
-        throw new Error("All fields are required.")
+    user.name = name || user.name
+    user.email = email || user.email
+
+    if (password) {
+        if (password.length < 8) {
+            res.status(400)
+            throw new Error("Password must be at least 8 characters long.")
+        }
+
+        user.password = await bcrypt.hash(password, 10)
     }
 
-    if (password.length < 8) {
-        res.status(400)
-        throw new Error("Password length must be 8 characters.")
-    }
+    const updatedUser = await user.save()
 
-    const alreadyRegistered = await User.findOne({ email })
-    if (alreadyRegistered) {
-        res.status(400)
-        throw new Error("Email is already registered.")
-    }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
-
-    const newUser = new User({
-        name,
-        email,
-        password: hashedPassword
-    })
-
-    await newUser.save()
-
-    const token = jwt.sign({
-        id: newUser._id
-    }, process.env.JWT_SECRET, {
-        expiresIn: '7d'
-    })
-
-    res.status(201).json({
-        message: "User registered successfully.",
-        token,
+    res.status(200).json({
+        message: "User updated successfully.",
         user: {
-            id: newUser._id,
-            name: newUser.name,
-            email: newUser.email,
-            role: newUser.role,
+            id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
         },
     })
 })
 
-export const loginUser = expressAsyncHandler(async (req, res) => {
 
-    const { email, password } = req.body
+export const deleteUser = expressAsyncHandler(async (req,res) => {
 
-    if (!email || !password) {
-        res.status(400)
-        throw new Error("All fields are required.")
-    }
+    const userId = req.params.id
 
-    const user = await User.findOne({ email })
+    const user = await User.findById(userId)
 
     if (!user) {
-        res.status(401)
-        throw new Error("Invalid email or password.")
+        res.status(404)
+        throw new Error("No user found.")
     }
 
-    const checkPassword = await bcrypt.compare(password, user.password)
-    if (!checkPassword) {
-        res.status(401)
-        throw new Error("Password do not match.")
-    }
-
-    const token = jwt.sign({
-        id: user._id
-    }, process.env.JWT_SECRET, {
-        expiresIn: '7d'
-    })
+    await user.deleteOne()
 
     res.status(200).json({
-        message: "Login Successful.",
-        token,
-        user: {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role
-        }
+        message: "User deleted successfully."
     })
-})
 
-export const profile = async (req, res) => {
-  res.json(req.user)
-}
+})

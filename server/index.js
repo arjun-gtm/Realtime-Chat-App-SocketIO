@@ -2,7 +2,8 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import { connectDB } from './src/config/db.js'
-import router from './src/routes/userRoutes.js'
+import authRouter from './src/routes/authRoute.js'
+import userRouter from './src/routes/userRoute.js'
 import { errorHandler } from './src/middlewares/errorHandler.js'
 
 const app = express()
@@ -17,8 +18,8 @@ const PORT = process.env.PORT || 4000
 
 connectDB()
 
-app.use('/api', router)
-app.use(errorHandler)
+app.use('/api', authRouter)
+app.use('/api', userRouter)
 
 app.get('/',(req,res) => {
     res.send("API is working.")
