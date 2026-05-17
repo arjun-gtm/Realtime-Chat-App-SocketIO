@@ -4,6 +4,8 @@ import { useNavigate, Link } from "react-router-dom";
 const HomePage = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const username = user === null ? "User" : user.name;
+  const isAdmin = user !== null && user.role === "admin";
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -16,7 +18,7 @@ const HomePage = () => {
       <div className="max-w-3xl mx-auto bg-white rounded-xl shadow p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-semibold">Welcome{user?.name ? `, ${user.name}` : ""}</h2>
+            <h2 className="text-2xl font-semibold">Welcome, {username}</h2>
             <p className="text-sm text-gray-500">Start chatting with your friends</p>
           </div>
 
@@ -24,11 +26,13 @@ const HomePage = () => {
             <Link to="/chat" className="px-4 py-2 bg-blue-600 text-white rounded-lg">
               Go to Chat
             </Link>
-            {user?.role === "admin" && (
+
+            {isAdmin && (
               <Link to="/admin" className="px-4 py-2 bg-gray-800 text-white rounded-lg">
-                Admin
+                Admin Dashboard
               </Link>
             )}
+
             <button onClick={logout} className="px-4 py-2 bg-red-500 text-white rounded-lg">
               Logout
             </button>
@@ -36,7 +40,7 @@ const HomePage = () => {
         </div>
 
         <div className="text-gray-700">
-          <p>This is the home page. Click "Go to Chat" to open the chat UI.</p>
+          <p>This is the home page. Click "Go to Chat" to open the chat.</p>
         </div>
       </div>
     </div>
