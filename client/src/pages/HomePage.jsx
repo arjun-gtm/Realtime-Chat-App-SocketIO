@@ -19,7 +19,7 @@ const HomePage = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-semibold">Welcome, {username}</h2>
-            <p className="text-sm text-gray-500">Start chatting with your friends</p>
+            <p className="text-sm text-gray-500">Start chatting.</p>
           </div>
 
           <div className="flex items-center gap-3">
