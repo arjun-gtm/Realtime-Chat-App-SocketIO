@@ -75,6 +75,12 @@ JWT_SECRET=your_jwt_secret
 FRONTEND_URL=http://localhost:5173
 ```
 
+Create a `.env` file inside the `client` folder:
+
+```env
+VITE_BACKEND_URL= http://localhost:4000
+```
+
 ---
 
 # Run Backend
