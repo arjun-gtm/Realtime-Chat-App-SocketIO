@@ -4,22 +4,31 @@ import toast from "react-hot-toast";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalMessages, setTotalMessages] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const { data } = await axiosInstance.get("/users");
-      setUsers(data.users || data);
+      const [usersResponse, messagesResponse] = await Promise.all([
+        axiosInstance.get("/users"),
+        axiosInstance.get("/messages"),
+      ]);
+
+      const usersData = usersResponse.data.users || usersResponse.data;
+      setUsers(usersData);
+      setTotalUsers(usersResponse.data.totalUsers || usersData.length);
+      setTotalMessages(messagesResponse.data.totalMessages || 0);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to fetch users");
+      toast.error(error.response?.data?.message || "Failed to fetch dashboard data");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchDashboardData();
   }, []);
 
   const deleteUser = async (id) => {
@@ -28,6 +37,7 @@ const AdminDashboard = () => {
       await axiosInstance.delete(`/users/${id}`);
       toast.success("User deleted");
       setUsers((u) => u.filter((x) => x._id !== id && x.id !== id));
+      setTotalUsers((count) => Math.max(count - 1, 0));
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete user");
     }
@@ -38,7 +48,10 @@ const AdminDashboard = () => {
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-semibold">Admin Dashboard</h2>
-          <div className="text-sm text-gray-600">Total users: {users.length}</div>
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <div>Total users: {totalUsers}</div>
+            <div>Total messages: {totalMessages}</div>
+          </div>
         </div>
 
         {loading ? (

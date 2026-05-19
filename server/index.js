@@ -8,6 +8,7 @@ import { initializeSocket } from "./src/socket/socket.js";
 import { connectDB } from "./src/config/db.js";
 import authRouter from "./src/routes/authRoute.js";
 import userRouter from "./src/routes/userRoute.js";
+import messageRouter from "./src/routes/messageRoute.js";
 import { errorHandler } from "./src/middlewares/errorHandler.js";
 
 const app = express();
@@ -35,6 +36,7 @@ connectDB();
 
 app.use("/api", authRouter);
 app.use("/api", userRouter);
+app.use("/api", messageRouter);
 
 app.get("/", (req, res) => {
   res.send("API is working.");

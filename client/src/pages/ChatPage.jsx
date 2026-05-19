@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import socket from "../socket.js";
+import axiosInstance from "../api/axiosInstance.js";
 
 const ChatPage = () => {
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -8,6 +9,22 @@ const ChatPage = () => {
   const [text, setText] = useState("");
 
   useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const { data } = await axiosInstance.get("/messages", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        setMessages(data.messages);
+      } catch (error) {
+        console.log(error.response?.data?.message || "Failed to load messages");
+      }
+    };
+
+    fetchMessages();
+
     socket.connect();
 
     socket.emit("user_join", user);
@@ -50,7 +67,6 @@ const ChatPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-        
         <header className="flex items-center justify-between p-4 border-b">
           <h3 className="text-lg font-semibold">Realtime Chat</h3>
 
@@ -60,13 +76,12 @@ const ChatPage = () => {
         </header>
 
         <main className="p-4 h-[60vh] flex flex-col">
-          
           <div className="flex-1 overflow-auto mb-4 space-y-3">
             {messages.map((m, index) => (
               <div
                 key={m._id || index}
                 className={`p-3 rounded-lg max-w-md ${
-                  m.sender?.name === user?.name
+                  m.sender?._id === user?.id || m.sender?.name === user?.name
                     ? "bg-blue-100 ml-auto"
                     : "bg-gray-100"
                 }`}
@@ -80,10 +95,7 @@ const ChatPage = () => {
             ))}
           </div>
 
-          <form
-            onSubmit={sendMessage}
-            className="flex items-center gap-2"
-          >
+          <form onSubmit={sendMessage} className="flex items-center gap-2">
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
