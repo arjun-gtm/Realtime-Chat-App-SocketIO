@@ -23,19 +23,27 @@ const HomePage = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link to="/chat" className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-              Go to Chat
-            </Link>
+            {user ? (
+              <>
+                <Link to="/chat" className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                  Go to Chat
+                </Link>
 
-            {isAdmin && (
-              <Link to="/admin" className="px-4 py-2 bg-gray-800 text-white rounded-lg">
-                Admin Dashboard
+                {isAdmin && (
+                  <Link to="/admin" className="px-4 py-2 bg-gray-800 text-white rounded-lg">
+                    Admin Dashboard
+                  </Link>
+                )}
+
+                <button onClick={logout} className="px-4 py-2 bg-red-500 text-white rounded-lg">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                Login
               </Link>
             )}
-
-            <button onClick={logout} className="px-4 py-2 bg-red-500 text-white rounded-lg">
-              Logout
-            </button>
           </div>
         </div>
 
